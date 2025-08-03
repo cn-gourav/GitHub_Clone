@@ -32,7 +32,9 @@ yargs(hideBin(process.argv))
                 type: "string",
             });
         },
-        commitRepo
+        (argv) => {
+            commitRepo(argv.message);
+        }
     )
     .command("push", "Push to file to repository", {}, pushRepo)
     .command("pull", "Pull to file to repository", {}, pullRepo)
