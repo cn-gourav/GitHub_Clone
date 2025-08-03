@@ -1,3 +1,13 @@
+const dotenv = require("dotenv");
+dotenv.config();
+const express = require("express");
+const app = express();
+const mongoose = require("mongoose");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const http = require("http");
+const { Server } = require("socket.io");
+
 const yargs = require("yargs");
 const { hideBin } = require("yargs/helpers");
 
@@ -57,5 +67,56 @@ yargs(hideBin(process.argv))
     .help().argv;
 
 function startServer() {
-    console.log("Server started successfully!");
+    const app = express();
+    const PORT = process.env.PORT || 3000;
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(express.json());
+
+    const mongoURI = process.env.MONGO_URI;
+
+    mongoose
+        .connect(mongoURI)
+        .then(() => {
+            console.log("Connected to MongoDB");
+        })
+        .catch((err) => {
+            console.error("Error connecting to MongoDB:", err);
+        });
+
+    app.use(cors({ origin: "*" }));
+
+    app.get("/", (req, res) => {
+        res.send("Welcome to the Git Server");
+    });
+
+    let user = "test";
+
+    const httpServer = http.createServer(app);
+    const io = new Server(httpServer, {
+        cors: {
+            origin: "*",
+            methods: ["GET", "POST"],
+        },
+    });
+
+    io.on("connection", (socket) => {
+        socket.on("joinRoom", (userID) => {
+            user = userID;
+            console.log("=====");
+            console.log(user);
+            console.log("=====");
+            socket.join(user);
+        });
+    });
+
+    const db = mongoose.connection;
+    db.once("open", async () => {
+        console.log("CRUD operattions called");
+        //CRUD operations
+    });
+
+    httpServer.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
 }
