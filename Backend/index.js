@@ -7,6 +7,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const http = require("http");
 const { Server } = require("socket.io");
+const mainRouter = require("./routes/main.router.js");
 
 const yargs = require("yargs");
 const { hideBin } = require("yargs/helpers");
@@ -73,6 +74,7 @@ function startServer() {
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(express.json());
 
+    app.use("/", mainRouter);
     const mongoURI = process.env.MONGO_URI;
 
     mongoose
@@ -85,10 +87,6 @@ function startServer() {
         });
 
     app.use(cors({ origin: "*" }));
-
-    app.get("/", (req, res) => {
-        res.send("Welcome to the Git Server");
-    });
 
     let user = "test";
 
