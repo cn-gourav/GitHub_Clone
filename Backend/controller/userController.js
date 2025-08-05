@@ -3,11 +3,9 @@ const jwt = require("jsonwebtoken");
 const { MongoClient } = require("mongodb");
 const dotenv = require("dotenv");
 dotenv.config();
+var ObjectId = require("mongodb").ObjectId;
 
 const URI = process.env.MONGO_URI;
-const getAllUsers = async (req, res) => {
-    res.send("All users fetched successfully");
-};
 
 let client;
 async function connectClient() {
@@ -78,6 +76,19 @@ const login = async (req, res) => {
     }
 };
 
+const getAllUsers = async (req, res) => {
+    try {
+        const userID = req.params.id;
+        await connectClient();
+        const db = client.db("githubclone");
+        const usersCollection = db.collection("users");
+        const users = await usersCollection.find({}).toArray();
+        res.json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "fetching failed" });
+    }
+};
 const getUserProfile = async (req, res) => {};
 
 const updateUserProfile = async (req, res) => {
