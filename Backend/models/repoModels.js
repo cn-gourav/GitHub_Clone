@@ -6,7 +6,6 @@ const RepositorySchema = new Schema({
     name: {
         type: String,
         required: true,
-        unique: true,
     },
     description: {
         type: String,
@@ -34,4 +33,4 @@ const RepositorySchema = new Schema({
 
 const Repository = mongoose.model("Repository", RepositorySchema);
 
-export default Repository;
+module.exports = Repository;
